@@ -10,6 +10,8 @@
 // an asynchronous operation allows other code to run
 // and will proceed when the operation is done.
 
+var game;
+
 function ajax(url, success, failure) {
     let xhr = new XMLHttpRequest();
 
@@ -46,10 +48,11 @@ function ajax(url, success, failure) {
 
 // a little bit different from
 // writing JS objects
-{
-    name: "Nick"
-    fn: () => 1;
-}
+
+//{
+//    name: "Nick"
+//    fn: () => 1;
+//}
 
 // JSON:
 // {
@@ -58,19 +61,17 @@ function ajax(url, success, failure) {
 // }
 
 document.addEventListener("DOMContentLoaded", () => {
-    let joke = document.getElementById("joke");
-    let jokeBtn = document.getElementById("jokeBtn");
-    let jsonText = document.getElementById("inputText");
-    let jsonBtn = document.getElementById("jsonBtn");
-    let jsonOut = document.getElementById("jsonOut");
+    let card = document.getElementById("card");
+    let cardBtn = document.getElementById("cardBtn");
+    let newGame = document.getElementById("newGame");
 
-    jokeBtn.addEventListener("click", event => {
+    cardBtn.addEventListener("click", event => {
         // params: url, success, failure
         ajax(
-            "https://deckofcardsapi.com/api/deck/new/draw/?count=1",
+            `https://deckofcardsapi.com/api/deck/${game}/draw/?count=1`,
             obj => {
                 console.log(obj);
-                joke.innerHTML = obj.cards[0].value + " of " + obj.cards[0].suit;
+                card.innerHTML = obj.cards[0].value + " of " + obj.cards[0].suit;
             },
             (res, status) => {
                 console.log(`Failure, status ${status}`);
@@ -78,61 +79,17 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     });
 
-    jsonBtn.addEventListener("click", event => {
-        let json = jsonText.value; // a string
-        try {
-            // convert JSON-format string into JS
-            let data = JSON.parse(json);
-            // now it's an object, or an array, or a number, etc.
-            console.log(data);
-
-            data.name = "Clark";
-            data.innerObj = {};
-
-            let newJson = JSON.stringify(data);
-            jsonOut.innerText = newJson;
-        } catch (err) {
-            // recover from errors thrown in the
-            // middle of the "try" block
-            console.log(err);
-        }
+    newGame.addEventListener("click", event =>{
+        ajax(
+            "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6",
+            obj => {
+                console.log(obj);
+                game = obj.deck_id;
+            },
+            (res, status) => {
+                console.log(`Failure, status ${status}`);
+            }
+        );
     });
 });
 
-//IIFE: "iffy"
-//immediately invoked function expression
-
-(function () {
-    var innerData = 0;
-
-    console.log(innerData);
-})();
-
-// innerData is out of scope
-
-// the point is, to have code running directly in the script
-// (not behind and event listener) but without our temporary
-// variables getting into that global namespace.
-
-//(because var gives us function scope.)
-
-// these days we tend to use modules for this kind of thing instead.
-
-//Closure
-
-function newCounter(){
-
-}
-
-//in JS, when you have an inner function
-//inside an outer function, and the
-//inner function references some
-//variable from the outer function,
-//it "closes over" that variable
-//and keeps it around even if it otherwise 
-//would pass out of scope and be deleted
-
-//this is called closure.
-
-let a = newCounter();
-console.log(`${a()} ${a()} ${a()}`);
