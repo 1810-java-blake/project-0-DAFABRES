@@ -11,6 +11,8 @@
 // and will proceed when the operation is done.
 
 var game;
+var player;
+var dealer;
 
 function ajax(url, success, failure) {
     let xhr = new XMLHttpRequest();
@@ -18,7 +20,9 @@ function ajax(url, success, failure) {
     // the "readyState" tells you the progress of
     // receiving the response.
     xhr.onreadystatechange = () => {
-        console.log(xhr.readyState);
+        
+        //console.log(xhr.readyState);
+        
         // TODO: handle the response
         if (xhr.readyState === 4) {
             // we've received the full response.
@@ -41,7 +45,8 @@ function ajax(url, success, failure) {
     xhr.send();
     // the next thing that'll happen is
     // readystatechange will fire a bunch of times
-    console.log("end of ajax function.");
+   
+    //console.log("end of ajax function.");
 }
 
 // JSON: JavaScript object notation
@@ -64,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let card = document.getElementById("card");
     let cardBtn = document.getElementById("cardBtn");
     let newGame = document.getElementById("newGame");
+    let hit = document.getElementById("hitBtn");
 
     cardBtn.addEventListener("click", event => {
         // params: url, success, failure
@@ -81,10 +87,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     newGame.addEventListener("click", event =>{
         ajax(
-            "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6",
+            "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
             obj => {
-                console.log(obj);
+                // console.log(obj);
                 game = obj.deck_id;
+                drawCard("player", () => {
+                    drawCard("dealer", () =>{
+                        drawCard("player", () => {
+                            drawCard("dealer", () => {
+                                console.log("success");
+                            })
+                        })
+                    })
+                });
+               // drawCard("dealer");
+               // drawCard("player");
+               // drawCard("dealer");
             },
             (res, status) => {
                 console.log(`Failure, status ${status}`);
@@ -93,3 +111,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+var currentCard;
+function drawCard(pileId, success){
+    ajax(
+        `https://deckofcardsapi.com/api/deck/${game}/draw/?count=1`,
+        obj => {
+            //console.log(obj);
+            currentCard = obj.cards[0].code;
+            var x = `https://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/add/?cards=${currentCard}`;
+            //console.log(x);
+            ajax(
+                x,
+                obj => {
+                    //console.log(obj);
+                    ajax(
+                        `http://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/list/`,
+                        obj => {
+                            console.log(obj);
+                            success();
+                        },
+                        (res,status) => {
+                            console.log(`Failure, status ${status}`);
+                        }
+                    );
+                },
+                (res,status) => {
+                    console.log(`Failure, status ${status}`);
+                }
+            );
+            
+        },
+        (res, status) => {
+            console.log(`Failure, status ${status}`);
+        }
+    );
+
+
+    // either promise or have drawCard accept a function as a parameter
+
+    /* var x = `https://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/add/?cards=${currentCard}`;
+    console.log(x);
+    ajax(
+
+        x,
+        obj => {
+            console.log(obj);
+        },
+        (res,status) => {
+            console.log(`Failure, status ${status}`);
+        }
+    ); */
+
+}
+
+// gin rummy?
+// war?
+
+//promise
+//callbacks
+
+
+/*
+    fetchBtn.addEventListener("click", event => {
+        fetch("http://api.icndb.com/jokes/random/")
+            // .json() method returns a Promise
+            // of the response body parsed from JSON
+            .then(res => res.json())
+            .then(data => {
+                joke.innerHTML = data.value.joke;
+            })
+            .catch(err => console.log(err));
+    });
+*/
