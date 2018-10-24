@@ -88,14 +88,17 @@ document.addEventListener("DOMContentLoaded", () => {
     newGame.addEventListener("click", event =>{
         ajax(
             "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
+            // give this obj a new name
             obj => {
                 // console.log(obj);
                 game = obj.deck_id;
                 drawCard("player", () => {
                     drawCard("dealer", () =>{
                         drawCard("player", () => {
-                            drawCard("dealer", () => {
+                            drawCard("dealer", (obj) => {
+                                //ajax again for point calculation
                                 console.log("success");
+                                currentScore(obj.piles.dealer.cards);
                             })
                         })
                     })
@@ -108,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(`Failure, status ${status}`);
             }
         );
+
     });
 });
 
@@ -128,7 +132,7 @@ function drawCard(pileId, success){
                         `http://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/list/`,
                         obj => {
                             console.log(obj);
-                            success();
+                            success(obj);
                         },
                         (res,status) => {
                             console.log(`Failure, status ${status}`);
@@ -144,9 +148,8 @@ function drawCard(pileId, success){
         (res, status) => {
             console.log(`Failure, status ${status}`);
         }
-    );
-
-
+    );   
+}
     // either promise or have drawCard accept a function as a parameter
 
     /* var x = `https://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/add/?cards=${currentCard}`;
@@ -162,7 +165,61 @@ function drawCard(pileId, success){
         }
     ); */
 
+
+
+/* function valueTranslation(hand){
+    var i;
+    for (i = 0; i < hand.length; i++){
+        if (hand[i].value === 'ACE'){
+            hand[i] = 11;
+        }
+        else if (hand[i].value === 'KING'){
+            hand[i] = 10;
+        }
+        else if (hand[i].value === 'QUEEN'){
+            hand[i] = 10;
+        }
+        else if (hand[i].value === 'JACK'){
+            hand[i] = 10;
+        }
+        else{
+            hand[i] = hand[i].value;
+        }
+    }
+    //console.log(hand);
 }
+*/
+
+function handTranslation(card){
+    console.log(card);
+    if (card.value === 'ACE'){
+        return 11;
+    }
+    else if (card.value === 'KING'){
+        return 10;
+    }
+    else if (card.value === 'QUEEN'){
+        return 10;
+    }
+    else if (card.value === 'JACK'){
+        return 10;
+    }
+    else{
+        return +card.value;;
+    }
+}
+
+function currentScore(hand){
+    var points = hand.map(handTranslation);
+    var total = 0;
+    var i;
+    for (i = 0; i < points.length; i++){
+        total = total + points[i];
+    }
+    console.log(total);
+}
+//array.map!!!!!!!!!!!!!!!!!!!!!!!!
+//for-of loop
 
 // gin rummy?
 // war?
