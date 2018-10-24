@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let card = document.getElementById("card");
     let cardBtn = document.getElementById("cardBtn");
     let newGame = document.getElementById("newGame");
-    let hit = document.getElementById("hitBtn");
+    let hitBtn = document.getElementById("hitBtn");
 
     cardBtn.addEventListener("click", event => {
         // params: url, success, failure
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     });
 
-    newGame.addEventListener("click", event =>{
+    newGame.addEventListener("click", event => {
         ajax(
             "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",
             // give this obj a new name
@@ -94,7 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 game = obj.deck_id;
                 drawCard("player", () => {
                     drawCard("dealer", () =>{
-                        drawCard("player", () => {
+                        drawCard("player", (obj) => {
+                            currentScore(obj.piles.player.cards);
                             drawCard("dealer", (obj) => {
                                 //ajax again for point calculation
                                 console.log("success");
@@ -113,6 +114,22 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
     });
+
+
+    hitBtn.addEventListener("click", event => {
+        ajax(
+            `http://deckofcardsapi.com/api/deck/${game}/pile/player/list/`,
+            obj => {
+                console.log(obj);
+                drawCard("player", (obj) => {
+                    currentScore(obj.piles.player.cards);
+                });
+            },
+            (res, status) => {
+                console.log(`Failure, status ${status}`);
+            }
+        );
+    }); 
 });
 
 var currentCard;
@@ -166,6 +183,7 @@ function drawCard(pileId, success){
     ); */
 
 
+//old value function
 
 /* function valueTranslation(hand){
     var i;
@@ -191,7 +209,7 @@ function drawCard(pileId, success){
 */
 
 function handTranslation(card){
-    console.log(card);
+    //console.log(card);
     if (card.value === 'ACE'){
         return 11;
     }
@@ -216,13 +234,29 @@ function currentScore(hand){
     for (i = 0; i < points.length; i++){
         total = total + points[i];
     }
+
+
+    while((points.includes(11)) && (total > 21)){
+        var loc = points.findIndex((element) => {
+            return element === 11;
+        });
+        points[loc] = 1;
+        total = total - 10;
+    }
+
+    if(total > 21){
+        console.log("You went over!!! You Lose.")
+    }
     console.log(total);
+
 }
+
+
+//disable = true
+//use array.includes!!!!!!!!!!!!!!!!!!!!!!!!!!
 //array.map!!!!!!!!!!!!!!!!!!!!!!!!
 //for-of loop
 
-// gin rummy?
-// war?
 
 //promise
 //callbacks
