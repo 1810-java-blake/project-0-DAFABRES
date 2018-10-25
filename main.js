@@ -11,8 +11,8 @@
 // and will proceed when the operation is done.
 
 var game;
-var player;
-var dealer;
+var playerPoints;
+var dealerPoints;
 
 function ajax(url, success, failure) {
     let xhr = new XMLHttpRequest();
@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let cardBtn = document.getElementById("cardBtn");
     let newGame = document.getElementById("newGame");
     let hitBtn = document.getElementById("hitBtn");
+    let stayBtn = document.getElementById("stayBtn");
 
     cardBtn.addEventListener("click", event => {
         // params: url, success, failure
@@ -95,18 +96,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 drawCard("player", () => {
                     drawCard("dealer", () =>{
                         drawCard("player", (obj) => {
-                            currentScore(obj.piles.player.cards);
+                            currentScore(obj.piles.player.cards, "player");
                             drawCard("dealer", (obj) => {
                                 //ajax again for point calculation
                                 console.log("success");
-                                currentScore(obj.piles.dealer.cards);
+                                currentScore(obj.piles.dealer.cards, "dealer");
                             })
                         })
                     })
                 });
-               // drawCard("dealer");
-               // drawCard("player");
-               // drawCard("dealer");
             },
             (res, status) => {
                 console.log(`Failure, status ${status}`);
@@ -122,14 +120,21 @@ document.addEventListener("DOMContentLoaded", () => {
             obj => {
                 console.log(obj);
                 drawCard("player", (obj) => {
-                    currentScore(obj.piles.player.cards);
-                });
+                    currentScore(obj.piles.player.cards, "player");
+                    if(playerPoints > 21){
+                        dealerTurn();
+                    }
+                });    
             },
             (res, status) => {
                 console.log(`Failure, status ${status}`);
             }
         );
-    }); 
+    });
+    
+    stayBtn.addEventListener("click", event => {
+        dealerTurn();
+    });
 });
 
 var currentCard;
@@ -227,7 +232,7 @@ function handTranslation(card){
     }
 }
 
-function currentScore(hand){
+function currentScore(hand, agent){
     var points = hand.map(handTranslation);
     var total = 0;
     var i;
@@ -243,15 +248,47 @@ function currentScore(hand){
         points[loc] = 1;
         total = total - 10;
     }
-
-    if(total > 21){
-        console.log("You went over!!! You Lose.")
-    }
     console.log(total);
-
+    if (agent === "dealer") {
+        dealerPoints = total;
+    } else if (agent === "player") {
+        playerPoints = total;
+    }
 }
 
+function dealerTurn(){
+    ajax(
+        `http://deckofcardsapi.com/api/deck/${game}/pile/dealer/list/`,
+        obj => {
+            if (playerPoints > 21){
+                console.log("You busted, the house wins, try again?")
+                return 0;
+            }
 
+            while(dealerPoints < 17){
+                drawCard("dealer", () => {
+                    currentScore(obj.piles.dealer.cards, "dealer");
+                    console.out(dealerPoints);
+                });
+            }
+            if (dealerPoints < playerPoints){
+                console.log("You win!!!");
+                return 0;
+            } else if (dealerPoints === playerPoints) {
+                console.log("It's a draw");
+                return 0;
+            } else if (dealerPoints > playerPoints){
+                console.log("The house wins, try again?");
+                return 0;
+            } else if (dealerPoints > 21){
+                console.log("The house busted, you win!!!");
+                return 0;
+            } 
+        },
+        (res,status) => {
+            console.log(`Failure, status ${status}`);            
+        });
+}
 //disable = true
 //use array.includes!!!!!!!!!!!!!!!!!!!!!!!!!!
 //array.map!!!!!!!!!!!!!!!!!!!!!!!!
