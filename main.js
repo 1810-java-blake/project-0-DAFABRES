@@ -264,25 +264,29 @@ function dealerTurn(){
                 console.log("You busted, the house wins, try again?")
                 return 0;
             }
-
-            while(dealerPoints < 17){
-                drawCard("dealer", () => {
+            
+            if (dealerPoints < 17){
+                drawCard("dealer", (obj) => {
                     currentScore(obj.piles.dealer.cards, "dealer");
-                    console.out(dealerPoints);
+                    dealerTurn();
                 });
             }
-            if (dealerPoints < playerPoints){
+            /* while(dealerPoints < 17){
+                dealerPoints = dealerPoints + 1;
+                console.log(dealerPoints);
+                drawCard("dealer", (obj) => {
+                    currentScore(obj.piles.dealer.cards, "dealer");
+                });
+            } */
+
+            if ((dealerPoints < playerPoints) && dealerPoints >= 17){
                 console.log("You win!!!");
-                return 0;
-            } else if (dealerPoints === playerPoints) {
+            } else if ((dealerPoints === playerPoints) && dealerPoints >= 17) {
                 console.log("It's a draw");
-                return 0;
-            } else if (dealerPoints > playerPoints){
+            } else if ((dealerPoints > playerPoints) && (dealerPoints < 22) && dealerPoints >=17){
                 console.log("The house wins, try again?");
-                return 0;
-            } else if (dealerPoints > 21){
+            } else if ((dealerPoints > 21) && dealerPoints >= 17){
                 console.log("The house busted, you win!!!");
-                return 0;
             } 
         },
         (res,status) => {
