@@ -1,3 +1,15 @@
 textarea {
-    font-family: monospace
+    font-family: monospace;
+}
+
+#card {
+    display: none;
+}
+
+#hitBtn{
+    display: none;
+}
+
+#stayBtn{
+    display: none;
 }

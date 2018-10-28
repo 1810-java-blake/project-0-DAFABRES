@@ -66,13 +66,13 @@ function ajax(url, success, failure) {
 // }
 
 document.addEventListener("DOMContentLoaded", () => {
-    let card = document.getElementById("card");
-    let cardBtn = document.getElementById("cardBtn");
+    //let card = document.getElementById("card");
+    //let cardBtn = document.getElementById("cardBtn");
     let newGame = document.getElementById("newGame");
     let hitBtn = document.getElementById("hitBtn");
     let stayBtn = document.getElementById("stayBtn");
 
-    cardBtn.addEventListener("click", event => {
+    /* cardBtn.addEventListener("click", event => {
         // params: url, success, failure
         ajax(
             `https://deckofcardsapi.com/api/deck/${game}/draw/?count=1`,
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(`Failure, status ${status}`);
             }
         );
-    });
+    }); */
 
     newGame.addEventListener("click", event => {
         ajax(
@@ -101,6 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                 //ajax again for point calculation
                                 console.log("success");
                                 currentScore(obj.piles.dealer.cards, "dealer");
+                                hitBtn.style.display = "block";
+                                stayBtn.style.display = "block";
+                                newGame.style.display = "none";
                             })
                         })
                     })
@@ -123,6 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     currentScore(obj.piles.player.cards, "player");
                     if(playerPoints > 21){
                         dealerTurn();
+                        hitBtn.style.display = "none";
+                        stayBtn.style.display = "none";
+                        newGame.style.display = "block";
                     }
                 });    
             },
@@ -134,6 +140,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     stayBtn.addEventListener("click", event => {
         dealerTurn();
+        hitBtn.style.display = "none";
+        stayBtn.style.display = "none";
+        newGame.style.display = "block";
     });
 });
 
