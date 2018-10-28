@@ -1,15 +1,11 @@
-textarea {
-    font-family: monospace;
-}
-
-#card {
-    display: none;
-}
-
 #hitBtn{
     display: none;
 }
 
 #stayBtn{
+    display: none;
+}
+
+#dealerArea{
     display: none;
 }

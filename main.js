@@ -71,6 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let newGame = document.getElementById("newGame");
     let hitBtn = document.getElementById("hitBtn");
     let stayBtn = document.getElementById("stayBtn");
+    let dealerArea = document.getElementById("dealerArea");
+    let playerArea = document.getElementById("playerArea");
+    let result = document.getElementById("result");
 
     /* cardBtn.addEventListener("click", event => {
         // params: url, success, failure
@@ -92,6 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // give this obj a new name
             obj => {
                 // console.log(obj);
+
+                playerArea.innerHTML = "<h3>Player</h3>";
+                dealerArea.innerHTML = "<h3>Dealer</h3>";
+                dealerArea.style.display = "none";
+                result.innerHTML = "";
                 game = obj.deck_id;
                 drawCard("player", () => {
                     drawCard("dealer", () =>{
@@ -129,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         hitBtn.style.display = "none";
                         stayBtn.style.display = "none";
                         newGame.style.display = "block";
+                        dealerArea.style.display = "block";
                     }
                 });    
             },
@@ -143,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hitBtn.style.display = "none";
         stayBtn.style.display = "none";
         newGame.style.display = "block";
+        dealerArea.style.display = "block";
     });
 });
 
@@ -151,7 +161,17 @@ function drawCard(pileId, success){
     ajax(
         `https://deckofcardsapi.com/api/deck/${game}/draw/?count=1`,
         obj => {
-            //console.log(obj);
+            console.log(obj);
+            var listItem = document.createElement("LI");
+            var text =  obj.cards[0].value + " of " + obj.cards[0].suit;
+            listItem.innerHTML = text;
+
+            if(pileId === "dealer"){
+                dealerArea.appendChild(listItem);
+            }
+            else if (pileId === "player"){
+                playerArea.appendChild(listItem);
+            }
             currentCard = obj.cards[0].code;
             var x = `https://deckofcardsapi.com/api/deck/${game}/pile/${pileId}/add/?cards=${currentCard}`;
             //console.log(x);
@@ -270,6 +290,7 @@ function dealerTurn(){
         `http://deckofcardsapi.com/api/deck/${game}/pile/dealer/list/`,
         obj => {
             if (playerPoints > 21){
+                result.innerHTML = "<h3>You busted, the house wins, try again?</h3>";
                 console.log("You busted, the house wins, try again?")
                 return 0;
             }
@@ -289,12 +310,16 @@ function dealerTurn(){
             } */
 
             if ((dealerPoints < playerPoints) && dealerPoints >= 17){
+                result.innerHTML = "<h3>You win!!!</h3>";
                 console.log("You win!!!");
             } else if ((dealerPoints === playerPoints) && dealerPoints >= 17) {
+                result.innerHTML = "<h3>It's a draw</h3>";
                 console.log("It's a draw");
             } else if ((dealerPoints > playerPoints) && (dealerPoints < 22) && dealerPoints >=17){
+                result.innerHTML = "<h3>The house wins, try again?</h3>";
                 console.log("The house wins, try again?");
             } else if ((dealerPoints > 21) && dealerPoints >= 17){
+                result.innerHTML = "<h3>The house busted, you win!!!</h3>";
                 console.log("The house busted, you win!!!");
             } 
         },
