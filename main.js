@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             currentScore(obj.piles.player.cards, "player");
                             drawCard("dealer", (obj) => {
                                 //ajax again for point calculation
-                                console.log("success");
+                                //console.log("success");
                                 currentScore(obj.piles.dealer.cards, "dealer");
                                 hitBtn.style.display = "block";
                                 stayBtn.style.display = "block";
@@ -161,7 +161,7 @@ function drawCard(pileId, success){
     ajax(
         `https://deckofcardsapi.com/api/deck/${game}/draw/?count=1`,
         obj => {
-            console.log(obj);
+            //console.log(obj);
             var listItem = document.createElement("LI");
             var text =  obj.cards[0].value + " of " + obj.cards[0].suit;
             listItem.innerHTML = text;
